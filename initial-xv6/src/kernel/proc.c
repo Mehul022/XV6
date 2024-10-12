@@ -509,14 +509,15 @@ void scheduler_mlfq(void)
     {
       for (p = proc; p < &proc[NPROC]; p++)
       {
-        if (p->state == RUNNABLE)
-        {
           acquire(&p->lock);
+          // if(p->priority!=0)
+          // {
+          //   printf("Priority boost to process id %d from priority %d to 0.\n",p->pid,p->priority);
+          // }
           p->arrival_time = ticks;
           p->ticks=0;
           p->priority = 0;
           release(&p->lock);
-        }
       }
       boost_ticks = 0;
     }
@@ -554,6 +555,8 @@ void scheduler_mlfq(void)
     }
     selected_proc->state = RUNNING;
     c->proc = selected_proc;
+    // printf("Process %d has priority %d\n", selected_proc->pid, selected_proc->priority);
+    // fflush(stdout);
     int time_slice = get_time_slice(selected_proc->priority);
     swtch(&c->context, &selected_proc->context);
     if (selected_proc->state == RUNNABLE)
@@ -562,10 +565,12 @@ void scheduler_mlfq(void)
       {
         if (selected_proc->priority < MAX_PRIORITY)
         {
+          // printf("Process with pid %d priority id decreased to %d from %d\n",selected_proc->pid, selected_proc->priority+1,selected_proc->priority);
           selected_proc->priority++;
           selected_proc->arrival_time=ticks;
+          selected_proc->ticks = 0;
         }
-        selected_proc->ticks = 0;
+        
       }
     }
     c->proc = 0;

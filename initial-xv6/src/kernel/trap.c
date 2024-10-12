@@ -90,14 +90,14 @@ void usertrap(void)
       p->trapframe->epc = p->handler;
     }
   }
-  if (which_dev == 2 && SCHEDULER == LBS)
-  { // Timer interrupt
-    struct proc *p = myproc();
-    if (p && p->state == RUNNING)
-    {
-      yield(); // Preempt the process after one tick
-    }
-  }
+  // if (which_dev == 2 && SCHEDULER == LBS)
+  // { // Timer interrupt
+  //   struct proc *p = myproc();
+  //   if (p && p->state == RUNNING)
+  //   {
+  //     yield(); // Preempt the process after one tick
+  //   }
+  // }
   if (which_dev == 2 && SCHEDULER == MLFQ)
   { // Timer interrupt
     struct proc *p = myproc();
@@ -127,7 +127,6 @@ void usertrap(void)
   usertrapret();
 }
 
-//
 // return to user space
 //
 void usertrapret(void)

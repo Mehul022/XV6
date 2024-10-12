@@ -136,6 +136,7 @@ UPROGS=\
 	$U/_schedulertest\
 	$U/_syscount\
 	$U/_alarmtest\
+	$U/_test_process\
 	
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)

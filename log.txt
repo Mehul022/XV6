@@ -1,0 +1,181 @@
+Process 2 has priority 0
+Process 3 has priority 0
+Process 3 has priority 0
+Process 3 has priority 0
+Process 3 has priority 0
+Process 3 has priority 0
+Process 3 has priority 0
+Process 4 has priority 0
+Process 5 has priority 0
+Process 6 has priority 0
+Process 7 has priority 0
+Process 8 has priority 0
+Process 3 has priority 0
+Process 6 has priority 0
+Process with pid 4 priority id decreased to 1 from 0
+Process with pid 5 priority id decreased to 1 from 0
+Process 5 has priority 1
+Process 7 has priority 0
+Process 4 has priority 1
+Process 5 has priority 1
+Process 4 has priority 1
+Process 5 has priority 1
+Process 6 has priority 0
+Process 7 has priority 0
+Process 4 has priority 1
+Process 5 has priority 1
+Process 6 has priority 0
+Process 7 has priority 0
+Process 4 has priority 1
+Process 6 has priority 0
+Process 7 has priority 0
+Process 4 has priority 1
+Process 5 has priority 1
+Process 6 has priority 0
+Process with pid 4 priority id decreased to 2 from 1
+Process 7 has priority 0
+Process with pid 5 priority id decreased to 2 from 1
+Process 5 has priority 2
+Process 4 has priority 2
+Process 4 has priority 2
+Process 5 has priority 2
+Process 6 has priority 0
+Process 7 has priority 0
+Process 4 has priority 2
+Process 5 has priority 2
+Process 4 has priority 2
+Process 6 has priority 0
+Process 7 has priority 0
+Process 5 has priority 2
+Process 6 has priority 0
+Process 7 has priority 0
+Process 4 has priority 2
+Process 5 has priority 2
+Process 4 has priority 2
+Process 6 has priority 0
+Process 7 has priority 0
+Process 5 has priority 2
+Process 6 has priority 0
+Process 7 has priority 0
+Process 5 has priority 2
+Process 4 has priority 2
+Process 5 has priority 2
+Process 6 has priority 0
+Process 7 has priority 0
+Process 4 has priority 2
+Priority boost to process id 4 from priority 2 to 0.
+Priority boost to process id 5 from priority 2 to 0.
+Process 5 has priority 0
+Process with pid 5 priority id decreased to 1 from 0
+Process 5 has priority 1
+Process 6 has priority 0
+Process 4 has priority 0
+Process 7 has priority 0
+Process with pid 4 priority id decreased to 1 from 0
+Process 4 has priority 1
+Process 4 has priority 1
+Process 5 has priority 1
+Process 6 has priority 0
+Process 7 has priority 0
+Process 5 has priority 1
+Process 4 has priority 1
+Process 6 has priority 0
+Process 7 has priority 0
+Process 4 has priority 1
+Process 5 has priority 1
+Process 6 has priority 0
+Process 7 has priority 0
+Process with pid 5 priority id decreased to 2 from 1
+Process with pid 4 priority id decreased to 2 from 1
+Process 4 has priority 2
+Process 4 has priority 2
+Process 5 has priority 2
+Process 5 has priority 2
+Process 6 has priority 0
+Process 7 has priority 0
+Process 4 has priority 2
+Process 5 has priority 2
+Process 6 has priority 0
+Process 7 has priority 0
+Process 4 has priority 2
+Process 5 has priority 2
+Process 6 has priority 0
+Process 7 has priority 0
+Process 4 has priority 2
+Process 5 has priority 2
+Process 6 has priority 0
+Process 7 has priority 0
+Process 4 has priority 2
+Process 5 has priority 2
+Process 6 has priority 0
+Process 3 has priority 0
+Process 7 has priority 0
+Process 3 has priority 0
+Process 5 has priority 2
+Process 4 has priority 2
+Process 4 has priority 2
+Process 5 has priority 2
+Process 4 has priority 2
+Priority boost to process id 4 from priority 2 to 0.
+Priority boost to process id 5 from priority 2 to 0.
+Process 5 has priority 0
+Process with pid 5 priority id decreased to 1 from 0
+Process 4 has priority 0
+Process with pid 4 priority id decreased to 1 from 0
+Process 4 has priority 1
+Process 5 has priority 1
+Process 5 has priority 1
+Process 4 has priority 1
+Process 5 has priority 1
+Process 4 has priority 1
+Process 5 has priority 1
+Process 5 has priority 1
+Process 4 has priority 1
+Process with pid 4 priority id decreased to 2 from 1
+Process with pid 5 priority id decreased to 2 from 1
+Process 4 has priority 2
+Process 4 has priority 2
+Process 5 has priority 2
+Process 5 has priority 2
+Process 4 has priority 2
+Process 5 has priority 2
+Process 4 has priority 2
+Process 5 has priority 2
+Process 4 has priority 2
+Process 5 has priority 2
+Process 4 has priority 2
+Process 5 has priority 2
+Process 4 has priority 2
+Process 5 has priority 2
+Process 5 has priority 2
+Process 4 has priority 2
+Process 4 has priority 2
+Process 5 has priority 2
+Process with pid 4 priority id decreased to 3 from 2
+Process with pid 5 priority id decreased to 3 from 2
+Process 4 has priority 3
+Process 4 has priority 3
+Process 5 has priority 3
+Process 5 has priority 3
+Process 4 has priority 3
+Process 5 has priority 3
+Process 4 has priority 3
+Process 5 has priority 3
+Process 3 has priority 0
+Process 1 has priority 0
+Process 2 has priority 0
+Process 4 has priority 3
+Process 4 has priority 3
+Process 4 has priority 3
+Process 4 has priority 3
+Process 4 has priority 3
+Process 4 has priority 3
+Process 4 has priority 3
+Process 4 has priority 3
+Priority boost to process id 4 from priority 3 to 0.
+Priority boost to process id 0 from priority 3 to 0.
+Process 4 has priority 0
+Process with pid 4 priority id decreased to 1 from 0
+Process 4 has priority 1
+Process 4 has priority 1
+Process 1 has priority 0

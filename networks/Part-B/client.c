@@ -8,7 +8,8 @@
 #include <fcntl.h>
 #define TIMEOUT 0.1
 #define MAX_CHUNK_SIZE 10
-char **received_data;
+
+char **received_data = NULL;
 PendingACK *pending_acks = NULL;
 
 double get_current_time()
@@ -31,6 +32,7 @@ void remove_from_pending_acks(long long int seq_num)
 {
     PendingACK *current = pending_acks;
     PendingACK *previous = NULL;
+
     while (current != NULL)
     {
         if (current->seq_num == seq_num)
@@ -58,7 +60,6 @@ void send_data(int sockfd, char *data, struct sockaddr_in *client)
     data_chunk chunk;
     int flags = fcntl(sockfd, F_GETFL, 0);
     fcntl(sockfd, F_SETFL, flags | O_NONBLOCK);
-
     for (long long int seq = 0; seq < total_chunks; seq++)
     {
         chunk.seq_num = seq;
@@ -67,7 +68,6 @@ void send_data(int sockfd, char *data, struct sockaddr_in *client)
         chunk.total_chunks = total_chunks;
         sendto(sockfd, &chunk, sizeof(chunk), 0, (struct sockaddr *)client, sizeof(*client));
         add_to_pending_acks(seq);
-
         char ack[256];
         int ack_len = recvfrom(sockfd, ack, sizeof(ack), 0, NULL, NULL);
         if (ack_len > 0)
@@ -76,8 +76,6 @@ void send_data(int sockfd, char *data, struct sockaddr_in *client)
             printf("Received ACK for chunk %lld\n", ack_seq);
             remove_from_pending_acks(ack_seq);
         }
-
-        // Handle timeouts and retransmissions
         PendingACK *current = pending_acks;
         while (current != NULL)
         {
@@ -97,8 +95,6 @@ void send_data(int sockfd, char *data, struct sockaddr_in *client)
             current = current->next;
         }
     }
-
-    // Wait for remaining ACKs
     while (pending_acks != NULL)
     {
         PendingACK *current = pending_acks;
@@ -135,64 +131,28 @@ void send_data(int sockfd, char *data, struct sockaddr_in *client)
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2)
+    if (argc < 3)
     {
-        printf("No port provided\n");
+        fprintf(stderr, "ERROR, no IP address or port provided\n");
         exit(1);
     }
+    int sockfd;
+    struct sockaddr_in server_addr, client_addr;
+    socklen_t addr_len = sizeof(client_addr);
+    data_chunk chunk;
 
-    int server_fd;
-    struct sockaddr_in client, server_addr;
-    int opt = 1;
-
-    // Create socket
-    if ((server_fd = socket(AF_INET, SOCK_DGRAM, 0)) == 0)
+    if ((sockfd = socket(AF_INET, SOCK_DGRAM, 0)) < 0)
     {
-        perror("socket failed");
+        perror("socket creation failed");
         exit(EXIT_FAILURE);
     }
-
-    // Configure server address
-    memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
-    server_addr.sin_addr.s_addr = INADDR_ANY; // Listen on any interface
-    server_addr.sin_port = htons(atoi(argv[1]));
-
-    // Bind socket
-    if (bind(server_fd, (const struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
-    {
-        perror("bind failed");
-        close(server_fd);
-        exit(EXIT_FAILURE);
-    }
-    char buffer[1024];
-
-    // Receive first message to identify client
+    server_addr.sin_port = htons(atoi(argv[2]));
+    inet_pton(AF_INET, argv[1], &server_addr.sin_addr);
+    char *message = "Hello from client!";
+    sendto(sockfd, message, strlen(message), 0, (struct sockaddr *)&server_addr, sizeof(server_addr));
     while (1)
     {
-        socklen_t client_len = sizeof(client);
-        int n = recvfrom(server_fd, buffer, sizeof(buffer), 0, (struct sockaddr *)&client, &client_len);
-        if (n >= 0)
-        {
-            printf("Received message from client: %s\n", buffer);
-            break;
-        }
-    }
-    while (1)
-    {
-        printf("Enter data to input max 1024 characters ");
-
-        char random_data[1024];
-        fgets(random_data, sizeof(random_data), stdin);
-        // Send data to the identified client
-        // printf("hii server %s\n", random_data);
-        send_data(server_fd, random_data, &client);
-
-        // Prepare to receive additional chunks
-        data_chunk chunk;
-        chunk.seq_num = -1;
-        sendto(server_fd, &chunk, sizeof(chunk), 0, (struct sockaddr *)&client, sizeof(client));
-
         int count = 0;
         int flag = 0;
         int array_size = 10;
@@ -200,15 +160,15 @@ int main(int argc, char *argv[])
         if (!received_data)
         {
             perror("malloc failed");
-            close(server_fd);
+            close(sockfd);
             exit(EXIT_FAILURE);
         }
-
         while (1)
         {
-            int n = recvfrom(server_fd, &chunk, sizeof(chunk), 0, (struct sockaddr *)&client, &(socklen_t){sizeof(client)});
+            int n = recvfrom(sockfd, &chunk, sizeof(chunk), 0, (struct sockaddr *)&client_addr, &addr_len);
             if (n < 0)
             {
+                // perror("recvfrom failed");
                 continue;
             }
             if (chunk.seq_num == -1)
@@ -222,7 +182,7 @@ int main(int argc, char *argv[])
                 if (!received_data)
                 {
                     perror("realloc failed");
-                    close(server_fd);
+                    close(sockfd);
                     exit(EXIT_FAILURE);
                 }
             }
@@ -233,7 +193,7 @@ int main(int argc, char *argv[])
             {
                 char ack[256];
                 sprintf(ack, "%lld", chunk.seq_num);
-                sendto(server_fd, ack, sizeof(ack), 0, (struct sockaddr *)&client, sizeof(client));
+                sendto(sockfd, ack, sizeof(ack), 0, (struct sockaddr *)&client_addr, addr_len);
                 flag = 0;
             }
             else
@@ -241,7 +201,6 @@ int main(int argc, char *argv[])
                 flag = 1;
             }
         }
-
         printf("Received Data in Order:\n");
         for (int i = 0; i < count && received_data[i] != NULL; i++)
         {
@@ -250,8 +209,15 @@ int main(int argc, char *argv[])
         }
         printf("\n");
         free(received_data);
-        printf("\n");
+        printf("Enter data to input max 1024 characters ");
+        char random_data[1024];
+        fgets(random_data, sizeof(random_data), stdin);
+        // printf("hii client %s\n", random_data);
+        send_data(sockfd, random_data, &server_addr);
+        data_chunk chunk2;
+        chunk2.seq_num = -1;
+        sendto(sockfd, &chunk2, sizeof(chunk2), 0, (struct sockaddr *)&server_addr, sizeof(server_addr));
     }
-    close(server_fd);
+    close(sockfd);
     return 0;
 }
