@@ -10,8 +10,8 @@ struct cpu cpus[NCPU];
 
 struct proc proc[NPROC];
 
-struct proc *mlfq_queues[4][NPROC];
-int queue_sizes[] = {0, 0, 0, 0};
+struct proc *mlfq[4][NPROC];
+int queues_sizes[] = {0, 0, 0, 0};
 int boost_ticks = 0;
 struct proc *initproc;
 
@@ -51,11 +51,54 @@ uint64 rand(void)
   seed = (seed * 48271) % 2147483647; // LCG formula
   return seed;
 }
+
+void Enqueue(struct proc *p, int priority)
+{
+  if (!p || priority < 0 || priority >= 4)
+    return;
+  p->ticks = 0;
+  if (queues_sizes[priority] < NPROC)
+  {
+    mlfq[priority][queues_sizes[priority]++] = p;
+    p->priority = priority;
+  }
+}
+
+struct proc *dequeue(int priority)
+{
+  if (priority < 0 || priority >= 4 || queues_sizes[priority] == 0)
+    return 0;
+
+  struct proc *p = mlfq[priority][0];
+  for (int i = 1; i < queues_sizes[priority]; i++)
+  {
+    mlfq[priority][i - 1] = mlfq[priority][i];
+  }
+  queues_sizes[priority]--;
+  mlfq[priority][queues_sizes[priority]] = 0;
+  return p;
+}
+
+void initialize()
+{
+  for (int i = 0; i < 4; i++)
+  {
+    for (int j = 0; j < queues_sizes[i]; j++)
+    {
+      mlfq[i][j] = 0;
+    }
+  }
+  // memset(mlfq, 0, sizeof(mlfq));
+  for (int i = 0; i < 4; i++)
+    queues_sizes[i] = 0;
+}
+
 // initialize the proc table.
 void procinit(void)
 {
   struct proc *p;
-
+  boost_ticks = 0;
+  // boost_ticks=ticks;
   initlock(&pid_lock, "nextpid");
   initlock(&wait_lock, "wait_lock");
   for (p = proc; p < &proc[NPROC]; p++)
@@ -162,10 +205,10 @@ found:
   p->ctime = ticks;
   p->tickets = 1;
   p->ticks = 0;
-  p->arrival_time = ticks;// to add new process in the end;
+  p->arrival_time = ticks; // to add new process in the end;
   p->priority = 0;
-  // enqueue(mlfq_queues[0], p, queue_sizes[0]);
-  // queue_sizes[0]++;
+  // enqueue(mlfq_queues[0], p, queues_sizes[0]);
+  // queues_sizes[0]++;
   for (int x = 0; x <= 26; x++)
   {
     p->syscall_count[x] = 0;
@@ -277,9 +320,10 @@ void userinit(void)
   p->cwd = namei("/");
 
   p->state = RUNNABLE;
+  Enqueue(p, p->priority);
   // p->priority = 0;
-  // enqueue(mlfq_queues[0], p, queue_sizes[0]);
-  // queue_sizes[0]++;
+  // enqueue(mlfq_queues[0], p, queues_sizes[0]);
+  // queues_sizes[0]++;
 
   release(&p->lock);
 }
@@ -354,6 +398,7 @@ int fork(void)
 
   acquire(&np->lock);
   np->state = RUNNABLE;
+  Enqueue(p, p->priority);
   release(&np->lock);
 
   return pid;
@@ -497,85 +542,176 @@ int get_time_slice(int priority)
   }
 }
 
+// void scheduler_mlfq(void)
+// {
+//   struct proc *p;
+//   struct cpu *c = mycpu();
+//   c->proc = 0;
+//   for (;;)
+//   {
+//     intr_on();
+//     if (boost_ticks >= BOOST_INTERVAL)
+//     {
+//       for (p = proc; p < &proc[NPROC]; p++)
+//       {
+//           acquire(&p->lock);
+//           // if(p->priority!=0)
+//           // {
+//           //   printf("Priority boost to process id %d from priority %d to 0.\n",p->pid,p->priority);
+//           // }
+//           p->arrival_time = ticks;
+//           p->ticks=0;
+//           p->priority = 0;
+//           release(&p->lock);
+//       }
+//       boost_ticks = 0;
+//     }
+//     struct proc *selected_proc = 0;
+//     int min=3;
+//     for (p = proc; p < &proc[NPROC]; p++)
+//     {
+//       if (p->state == RUNNABLE)
+//       {
+//         if (selected_proc == 0)
+//         {
+//           selected_proc = p;
+//           min = selected_proc->priority;
+//         }
+//         else if (p->priority < min)
+//         {
+//           selected_proc = p;
+//           min = selected_proc->priority;
+//         }
+//         else if (p->priority == min && p->arrival_time < selected_proc->arrival_time)
+//         {
+//           selected_proc = p;
+//         }
+//       }
+//     }
+//     if (!selected_proc)
+//     {
+//       continue;
+//     }
+//     acquire(&selected_proc->lock);
+//     if (selected_proc->state != RUNNABLE)
+//     {
+//       release(&selected_proc->lock);
+//       continue;
+//     }
+//     selected_proc->state = RUNNING;
+//     c->proc = selected_proc;
+//     // printf("Process %d has priority %d\n", selected_proc->pid, selected_proc->priority);
+//     // fflush(stdout);
+//     int time_slice = get_time_slice(selected_proc->priority);
+//     swtch(&c->context, &selected_proc->context);
+//     if (selected_proc->state == RUNNABLE)
+//     {
+//       if (selected_proc->ticks >= time_slice)
+//       {
+//         if (selected_proc->priority < MAX_PRIORITY)
+//         {
+//           // printf("Process with pid %d priority id decreased to %d from %d\n",selected_proc->pid, selected_proc->priority+1,selected_proc->priority);
+//           selected_proc->priority++;
+//           selected_proc->arrival_time=ticks;
+//         }
+//         selected_proc->ticks = 0;
+//       }
+//     }
+//     c->proc = 0;
+//     release(&selected_proc->lock);
+//     boost_ticks++;
+//   }
+// }
+
+void priority_boost()
+{
+  initialize();
+  struct proc *p;
+  for (p = proc; p < &proc[NPROC]; p++)
+  {
+    acquire(&p->lock);
+    if (p->state == RUNNABLE)
+    {
+      // if (p->priority != 0)
+      // {
+      //   printf("Priority boost to process id %d from priority %d to 0.\n", p->pid, p->priority);
+      // }
+      p->priority = 0;
+      // p->ticks = ticks;
+      p->ticks=0;
+      Enqueue(p, 0);
+    }
+    release(&p->lock);
+  }
+  boost_ticks = 0;
+}
+
 void scheduler_mlfq(void)
 {
-  struct proc *p;
   struct cpu *c = mycpu();
   c->proc = 0;
   for (;;)
   {
     intr_on();
-    if (boost_ticks >= BOOST_INTERVAL)
-    {
-      for (p = proc; p < &proc[NPROC]; p++)
-      {
-          acquire(&p->lock);
-          // if(p->priority!=0)
-          // {
-          //   printf("Priority boost to process id %d from priority %d to 0.\n",p->pid,p->priority);
-          // }
-          p->arrival_time = ticks;
-          p->ticks=0;
-          p->priority = 0;
-          release(&p->lock);
-      }
-      boost_ticks = 0;
-    }
-    struct proc *selected_proc = 0;
-    int min=3;
-    for (p = proc; p < &proc[NPROC]; p++)
-    {
-      if (p->state == RUNNABLE)
-      {
-        if (selected_proc == 0)
-        {
-          selected_proc = p;
-          min = selected_proc->priority;
-        }
-        else if (p->priority < min)
-        {
-          selected_proc = p;
-          min = selected_proc->priority;
-        }
-        else if (p->priority == min && p->arrival_time < selected_proc->arrival_time)
-        {
-          selected_proc = p;
-        }
-      }
-    }
-    if (!selected_proc)
-    {
-      continue;
-    }
-    acquire(&selected_proc->lock);
-    if (selected_proc->state != RUNNABLE)
-    {
-      release(&selected_proc->lock);
-      continue;
-    }
-    selected_proc->state = RUNNING;
-    c->proc = selected_proc;
-    // printf("Process %d has priority %d\n", selected_proc->pid, selected_proc->priority);
-    // fflush(stdout);
-    int time_slice = get_time_slice(selected_proc->priority);
-    swtch(&c->context, &selected_proc->context);
-    if (selected_proc->state == RUNNABLE)
-    {
-      if (selected_proc->ticks >= time_slice)
-      {
-        if (selected_proc->priority < MAX_PRIORITY)
-        {
-          // printf("Process with pid %d priority id decreased to %d from %d\n",selected_proc->pid, selected_proc->priority+1,selected_proc->priority);
-          selected_proc->priority++;
-          selected_proc->arrival_time=ticks;
-          selected_proc->ticks = 0;
-        }
-        
-      }
-    }
     c->proc = 0;
-    release(&selected_proc->lock);
     boost_ticks++;
+    if (boost_ticks>BOOST_INTERVAL)
+    {
+      priority_boost();
+    }
+    // if (ticks>boost_ticks +BOOST_INTERVAL)
+    // {
+    //   priority_boost();
+    // }
+    struct proc *selected_proc = 0;
+    for (int priority = 0; priority < 4; priority++)
+    {
+      if(queues_sizes[priority]>0)
+      {
+        selected_proc=mlfq[priority][0];
+        break;
+      }
+    }
+    int time_slice = get_time_slice(selected_proc->priority);
+    if (selected_proc)
+    {
+      acquire(&selected_proc->lock);
+      if (selected_proc->state == RUNNABLE)
+      {
+        selected_proc->state = RUNNING;
+        c->proc = selected_proc;
+        // printf("Process %d has priority %d and time =%d\n", selected_proc->pid, selected_proc->priority,ticks);
+        swtch(&c->context, &selected_proc->context);
+        c->proc = 0;
+      }
+      release(&selected_proc->lock);
+      acquire(&selected_proc->lock);
+      selected_proc->ticks++;
+      dequeue(selected_proc->priority);
+      if (selected_proc->state == RUNNABLE)
+      {
+        if (selected_proc->ticks >= time_slice)
+        {
+          if (selected_proc->priority < 3)
+          {
+            // printf("Process with pid %d priority id decreased to %d from %d\n", selected_proc->pid, selected_proc->priority + 1, selected_proc->priority);
+            selected_proc->priority++;
+            Enqueue(selected_proc, selected_proc->priority);
+            selected_proc->ticks = 0;
+          }
+          else
+          {
+            selected_proc->ticks = 0;
+            Enqueue(selected_proc, selected_proc->priority);
+          }
+        }
+        else
+        {
+          Enqueue(selected_proc, selected_proc->priority);
+        }
+      }
+      release(&selected_proc->lock);
+    }
   }
 }
 
@@ -652,6 +788,7 @@ void scheduler_lottery(void)
       }
       release(&p->lock);
     }
+
     if (selected_proc)
     {
       for (p = proc; p < &proc[NPROC]; p++)
@@ -666,6 +803,7 @@ void scheduler_lottery(void)
           release(&p->lock);
         }
       }
+      // acquire(&selected_proc->lock);
       acquire(&selected_proc->lock);
       if (selected_proc->state == RUNNABLE)
       {
@@ -674,6 +812,7 @@ void scheduler_lottery(void)
         swtch(&c->context, &selected_proc->context);
         c->proc = 0;
       }
+      // release(&selected_proc->lock);
       release(&selected_proc->lock);
     }
   }
@@ -814,6 +953,7 @@ void wakeup(void *chan)
       if (p->state == SLEEPING && p->chan == chan)
       {
         p->state = RUNNABLE;
+        Enqueue(p, p->priority);
       }
       release(&p->lock);
     }
@@ -837,6 +977,7 @@ int kill(int pid)
       {
         // Wake process from sleep().
         p->state = RUNNABLE;
+        Enqueue(p, p->priority);
       }
       release(&p->lock);
       return 0;
@@ -993,4 +1134,5 @@ void update_time()
     }
     release(&p->lock);
   }
+  
 }

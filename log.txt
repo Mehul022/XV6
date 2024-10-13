@@ -1,181 +1,98 @@
-Process 2 has priority 0
-Process 3 has priority 0
-Process 3 has priority 0
-Process 3 has priority 0
-Process 3 has priority 0
-Process 3 has priority 0
-Process 3 has priority 0
-Process 4 has priority 0
-Process 5 has priority 0
-Process 6 has priority 0
-Process 7 has priority 0
-Process 8 has priority 0
-Process 3 has priority 0
-Process 6 has priority 0
+Process 4 has priority 0 and time =144
 Process with pid 4 priority id decreased to 1 from 0
+Process 5 has priority 0 and time =145
 Process with pid 5 priority id decreased to 1 from 0
-Process 5 has priority 1
-Process 7 has priority 0
-Process 4 has priority 1
-Process 5 has priority 1
-Process 4 has priority 1
-Process 5 has priority 1
-Process 6 has priority 0
-Process 7 has priority 0
-Process 4 has priority 1
-Process 5 has priority 1
-Process 6 has priority 0
-Process 7 has priority 0
-Process 4 has priority 1
-Process 6 has priority 0
-Process 7 has priority 0
-Process 4 has priority 1
-Process 5 has priority 1
-Process 6 has priority 0
+Process 6 has priority 0 and time =146
+Process 7 has priority 0 and time =146
+Process 8 has priority 0 and time =146
+Process 3 has priority 0 and time =146
+Process 4 has priority 1 and time =146
 Process with pid 4 priority id decreased to 2 from 1
-Process 7 has priority 0
+Process 6 has priority 0 and time =150
+Process 7 has priority 0 and time =150
+Process 5 has priority 1 and time =150
 Process with pid 5 priority id decreased to 2 from 1
-Process 5 has priority 2
-Process 4 has priority 2
-Process 4 has priority 2
-Process 5 has priority 2
-Process 6 has priority 0
-Process 7 has priority 0
-Process 4 has priority 2
-Process 5 has priority 2
-Process 4 has priority 2
-Process 6 has priority 0
-Process 7 has priority 0
-Process 5 has priority 2
-Process 6 has priority 0
-Process 7 has priority 0
-Process 4 has priority 2
-Process 5 has priority 2
-Process 4 has priority 2
-Process 6 has priority 0
-Process 7 has priority 0
-Process 5 has priority 2
-Process 6 has priority 0
-Process 7 has priority 0
-Process 5 has priority 2
-Process 4 has priority 2
-Process 5 has priority 2
-Process 6 has priority 0
-Process 7 has priority 0
-Process 4 has priority 2
-Priority boost to process id 4 from priority 2 to 0.
-Priority boost to process id 5 from priority 2 to 0.
-Process 5 has priority 0
-Process with pid 5 priority id decreased to 1 from 0
-Process 5 has priority 1
-Process 6 has priority 0
-Process 4 has priority 0
-Process 7 has priority 0
-Process with pid 4 priority id decreased to 1 from 0
-Process 4 has priority 1
-Process 4 has priority 1
-Process 5 has priority 1
-Process 6 has priority 0
-Process 7 has priority 0
-Process 5 has priority 1
-Process 4 has priority 1
-Process 6 has priority 0
-Process 7 has priority 0
-Process 4 has priority 1
-Process 5 has priority 1
-Process 6 has priority 0
-Process 7 has priority 0
-Process with pid 5 priority id decreased to 2 from 1
-Process with pid 4 priority id decreased to 2 from 1
-Process 4 has priority 2
-Process 4 has priority 2
-Process 5 has priority 2
-Process 5 has priority 2
-Process 6 has priority 0
-Process 7 has priority 0
-Process 4 has priority 2
-Process 5 has priority 2
-Process 6 has priority 0
-Process 7 has priority 0
-Process 4 has priority 2
-Process 5 has priority 2
-Process 6 has priority 0
-Process 7 has priority 0
-Process 4 has priority 2
-Process 5 has priority 2
-Process 6 has priority 0
-Process 7 has priority 0
-Process 4 has priority 2
-Process 5 has priority 2
-Process 6 has priority 0
-Process 3 has priority 0
-Process 7 has priority 0
-Process 3 has priority 0
-Process 5 has priority 2
-Process 4 has priority 2
-Process 4 has priority 2
-Process 5 has priority 2
-Process 4 has priority 2
-Priority boost to process id 4 from priority 2 to 0.
-Priority boost to process id 5 from priority 2 to 0.
-Process 5 has priority 0
-Process with pid 5 priority id decreased to 1 from 0
-Process 4 has priority 0
-Process with pid 4 priority id decreased to 1 from 0
-Process 4 has priority 1
-Process 5 has priority 1
-Process 5 has priority 1
-Process 4 has priority 1
-Process 5 has priority 1
-Process 4 has priority 1
-Process 5 has priority 1
-Process 5 has priority 1
-Process 4 has priority 1
-Process with pid 4 priority id decreased to 2 from 1
-Process with pid 5 priority id decreased to 2 from 1
-Process 4 has priority 2
-Process 4 has priority 2
-Process 5 has priority 2
-Process 5 has priority 2
-Process 4 has priority 2
-Process 5 has priority 2
-Process 4 has priority 2
-Process 5 has priority 2
-Process 4 has priority 2
-Process 5 has priority 2
-Process 4 has priority 2
-Process 5 has priority 2
-Process 4 has priority 2
-Process 5 has priority 2
-Process 5 has priority 2
-Process 4 has priority 2
-Process 4 has priority 2
-Process 5 has priority 2
+Process 6 has priority 0 and time =154
+Process 7 has priority 0 and time =154
+Process 4 has priority 2 and time =154
 Process with pid 4 priority id decreased to 3 from 2
+Process 6 has priority 0 and time =162
+Process 7 has priority 0 and time =162
+Process 5 has priority 2 and time =162
 Process with pid 5 priority id decreased to 3 from 2
-Process 4 has priority 3
-Process 4 has priority 3
-Process 5 has priority 3
-Process 5 has priority 3
-Process 4 has priority 3
-Process 5 has priority 3
-Process 4 has priority 3
-Process 5 has priority 3
-Process 3 has priority 0
-Process 1 has priority 0
-Process 2 has priority 0
-Process 4 has priority 3
-Process 4 has priority 3
-Process 4 has priority 3
-Process 4 has priority 3
-Process 4 has priority 3
-Process 4 has priority 3
-Process 4 has priority 3
-Process 4 has priority 3
+Process 6 has priority 0 and time =170
+Process 7 has priority 0 and time =170
+Process 4 has priority 3 and time =170
+Process 6 has priority 0 and time =186
+Process 7 has priority 0 and time =186
+Process 5 has priority 3 and time =186
 Priority boost to process id 4 from priority 3 to 0.
-Priority boost to process id 0 from priority 3 to 0.
-Process 4 has priority 0
+Priority boost to process id 5 from priority 3 to 0.
+Process 4 has priority 0 and time =202
 Process with pid 4 priority id decreased to 1 from 0
-Process 4 has priority 1
-Process 4 has priority 1
-Process 1 has priority 0
+Process 5 has priority 0 and time =203
+Process with pid 5 priority id decreased to 1 from 0
+Process 6 has priority 0 and time =204
+Process 7 has priority 0 and time =204
+Process 4 has priority 1 and time =204
+Process with pid 4 priority id decreased to 2 from 1
+Process 6 has priority 0 and time =208
+Process 7 has priority 0 and time =208
+Process 5 has priority 1 and time =208
+Process with pid 5 priority id decreased to 2 from 1
+Process 6 has priority 0 and time =212
+Process 7 has priority 0 and time =212
+Process 4 has priority 2 and time =212
+Process with pid 4 priority id decreased to 3 from 2
+Process 6 has priority 0 and time =220
+Process 7 has priority 0 and time =220
+Process 5 has priority 2 and time =220
+Process 6 has priority 0 and time =227
+Process 7 has priority 0 and time =227
+Process 3 has priority 0 and time =227
+Process 4 has priority 3 and time =227
+Process 6 has priority 0 and time =243
+Process 7 has priority 0 and time =243
+Process 4 has priority 3 and time =243
+Priority boost to process id 4 from priority 3 to 0.
+Process 4 has priority 0 and time =259
+Process with pid 4 priority id decreased to 1 from 0
+Process 6 has priority 0 and time =260
+Process 7 has priority 0 and time =260
+Process 4 has priority 1 and time =260
+Process with pid 4 priority id decreased to 2 from 1
+Process 6 has priority 0 and time =264
+Process 7 has priority 0 and time =264
+Process 4 has priority 2 and time =264
+Process with pid 4 priority id decreased to 3 from 2
+Process 6 has priority 0 and time =272
+Process 7 has priority 0 and time =272
+Process 4 has priority 3 and time =272
+Process 6 has priority 0 and time =288
+Process 7 has priority 0 and time =288
+Process 4 has priority 3 and time =288
+Process 6 has priority 0 and time =304
+Process 7 has priority 0 and time =304
+Process 4 has priority 3 and time =304
+Priority boost to process id 4 from priority 3 to 0.
+Process 4 has priority 0 and time =320
+Process with pid 4 priority id decreased to 1 from 0
+Process 6 has priority 0 and time =321
+Process 7 has priority 0 and time =321
+Process 4 has priority 1 and time =321
+Process with pid 4 priority id decreased to 2 from 1
+Process 6 has priority 0 and time =325
+Process 7 has priority 0 and time =325
+Process 4 has priority 2 and time =325
+Process with pid 4 priority id decreased to 3 from 2
+Process 6 has priority 0 and time =333
+Process 7 has priority 0 and time =333
+Process 4 has priority 3 and time =333
+Process 6 has priority 0 and time =349
+Process 7 has priority 0 and time =349
+Process 4 has priority 3 and time =349
+Process 6 has priority 0 and time =365
+Process 7 has priority 0 and time =365
+Process 3 has priority 0 and time =365
+Process 1 has priority 0 and time =365
+Process 2 has priority 0 and time =365

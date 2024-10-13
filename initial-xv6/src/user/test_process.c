@@ -7,7 +7,7 @@ void cpu_bound()
     volatile int i;
     
     // printf("CPU-bound process started: PID %d\n", getpid());
-    for (i = 0; i < 2000000000; i++)
+    for (i = 0; i < 3000000000; i++)
         ; // Busy wait (CPU-bound)
     // printf("CPU-bound process finished: PID %d\n", getpid());
 }
@@ -26,7 +26,7 @@ void io_bound()
     // printf("I/O-bound process started: PID %d\n", getpid());
     for (int i = 0; i < 2; i++)
     {
-        sleep(10); // Simulate I/O wait
+        sleep(100); // Simulate I/O wait
     }
     // printf("I/O-bound process finished: PID %d\n", getpid());
 }

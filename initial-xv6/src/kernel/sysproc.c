@@ -130,6 +130,7 @@ uint64 sys_sigalarm(void)
   p->handler = handler;
   p->ticks = 0;
   p->alarm_active = 0;
+  // printf("gg");
   return 0;
 }
 

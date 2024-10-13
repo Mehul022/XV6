@@ -25,10 +25,11 @@ struct context
 #ifndef SCHEDULER
 #define SCHEDULER RR
 #endif
-
+extern struct proc *mlfq[4][NPROC]; // Array of queues for each priority level
+extern int queues_sizes[4];
 #define MAX_PRIORITY 3
 #define BOOST_INTERVAL 48
-
+extern int boost_ticks;
 // Per-CPU state.
 struct cpu
 {

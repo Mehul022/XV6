@@ -3,55 +3,60 @@ import re
 
 # Data Parsing Function
 def parse_log(log_lines):
-    process_data = {}
-    time_step = 0
+    process_run_intervals = []
+    current_running_process = None
+    last_time = None
+
     for line in log_lines:
+        # Extract time for each log entry (e.g., "time =365")
+        time_match = re.search(r'time =(\d+)', line)
+        if time_match:
+            current_time = int(time_match.group(1))
+
         # Handle initial priority assignment (e.g., "Process 6 has priority 0")
         match_init = re.search(r'Process (\d+) has priority (\d+)', line)
         if match_init:
             pid = int(match_init.group(1))
             priority = int(match_init.group(2))
-            if pid not in process_data:
-                process_data[pid] = {"time": [], "priority": []}
-            process_data[pid]["time"].append(time_step)
-            process_data[pid]["priority"].append(priority)
-            time_step += 1
 
-        # Handle priority decreases
-        match_decrease = re.search(r'Process with pid (\d+) priority id decreased to (\d+)', line)
-        if match_decrease:
-            pid = int(match_decrease.group(1))
-            priority = int(match_decrease.group(2))
-            if pid not in process_data:
-                process_data[pid] = {"time": [], "priority": []}
-            process_data[pid]["time"].append(time_step)
-            process_data[pid]["priority"].append(priority)
-            time_step += 1
+            # Store the current process data
+            if current_running_process is None:
+                current_running_process = {"pid": pid, "priority": priority}
+                last_time = current_time
+            else:
+                # End the previous process and store its interval
+                process_run_intervals.append({
+                    "pid": current_running_process["pid"],
+                    "start_time": last_time,
+                    "end_time": current_time,
+                    "priority": current_running_process["priority"]
+                })
+                # Start the new running process
+                current_running_process = {"pid": pid, "priority": priority}
+                last_time = current_time
 
-        # Handle priority boosts
-        match_boost = re.search(r'Priority boost to process id (\d+) from priority \d+ to (\d+)', line)
-        if match_boost:
-            pid = int(match_boost.group(1))
-            priority = int(match_boost.group(2))
-            if pid not in process_data:
-                process_data[pid] = {"time": [], "priority": []}
-            process_data[pid]["time"].append(time_step)
-            process_data[pid]["priority"].append(priority)
-            time_step += 1
+    # End the last running process and store its interval
+    if current_running_process is not None and last_time is not None:
+        process_run_intervals.append({
+            "pid": current_running_process["pid"],
+            "start_time": last_time,
+            "end_time": current_time,
+            "priority": current_running_process["priority"]
+        })
 
-    return process_data
+    return process_run_intervals
 
 # Read log data from log.txt
 with open("log.txt", "r") as file:
     log_lines = file.readlines()
 
 # Parse the log data
-process_data = parse_log(log_lines)
+process_run_intervals = parse_log(log_lines)
 
-# Define special PIDs to assign specific colors
-special_pids = {4, 5, 6, 7}
+# Define the hardcoded PIDs to plot
+hardcoded_pids = {4, 5, 6, 7}
 
-# Assign colors for special PIDs and black for others
+# Assign colors for hardcoded PIDs
 process_colors = {
     4: 'blue',
     5: 'purple',
@@ -59,39 +64,51 @@ process_colors = {
     7: 'cyan'
 }
 
+# Create a list for the legend with hardcoded PIDs and their colors
+legend_entries = [
+    {"pid": 4, "color": 'blue'},
+    {"pid": 5, "color": 'purple'},
+    {"pid": 6, "color": 'orange'},
+    {"pid": 7, "color": 'cyan'}
+]
+
 # Plot the results
-plt.figure(figsize=(10, 6))
+plt.figure(figsize=(12, 8))
 
-# Plot each process' priority over time
-for pid, data in process_data.items():
-    times = data["time"]
-    priorities = data["priority"]
+# Plot each process' running intervals for hardcoded PIDs only
+for interval in process_run_intervals:
+    pid = interval["pid"]
+    
+    # Only process hardcoded PIDs
+    if pid not in hardcoded_pids:
+        continue
 
-    # Assign color based on PID, defaulting to black for non-special PIDs
-    color = process_colors.get(pid, 'black')
+    time_start = interval["start_time"]
+    time_end = interval["end_time"]
+    priority = interval["priority"]
 
-    # Plot the initial point for each process
-    plt.plot(times[0], priorities[0], marker='o', color=color, label=f"Process {pid}" if pid in special_pids else "Other")
+    # Assign color based on PID
+    color = process_colors.get(pid)
 
-    for i in range(1, len(times)):
-        x_vals = [times[i-1], times[i]]
-        y_vals = [priorities[i-1], priorities[i]]
+    # Plot horizontal line when process is running (priority + 0.5)
+    plt.plot([time_start, time_end], [priority + 0.5, priority + 0.5], color=color)
 
-        # Draw the vertical line with the process's color
-        plt.plot([times[i], times[i]], [priorities[i-1], priorities[i]], color=color, lw=2)
-
-        # Plot the horizontal line in the process's color
-        plt.plot(x_vals, [priorities[i-1], priorities[i-1]], color=color, lw=2)
+    # Draw vertical lines at start and end of the running period
+    plt.plot([time_start, time_start], [priority, priority + 0.5], color=color)
+    plt.plot([time_end, time_end], [priority + 0.5, priority], color=color)
 
 # Customize the plot
-plt.xlabel("Time Step (Event Occurrence)")
+plt.xlabel("Time")
 plt.ylabel("Priority Level")
-plt.title("Process Priority Changes Over Time")
+plt.title("Process Running Intervals")
 plt.gca().invert_yaxis()  # Priority decreases go down
 plt.grid(True)
 
-# Set legend to show only special processes
-plt.legend()
+# Create a legend using the new legend_entries array
+for entry in legend_entries:
+    plt.plot([], [], color=entry["color"], label=f"Process {entry['pid']}")
+
+plt.legend(loc="upper right")
 
 # Show the plot
 plt.show()
