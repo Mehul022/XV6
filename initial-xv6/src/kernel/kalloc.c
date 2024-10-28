@@ -23,9 +23,49 @@ struct {
   struct run *freelist;
 } kmem;
 
+struct
+{
+  struct spinlock lock;
+  int count[PGROUNDUP(PHYSTOP) >> 12];
+} page_ref;
+
+void incref(void *pa)
+{
+  acquire(&page_ref.lock);
+  if (page_ref.count[(uint64)pa >> 12] < 0)
+  {
+    panic("increase_pgreference");
+  }
+  page_ref.count[(uint64)pa >> 12]++;
+  release(&page_ref.lock);
+}
+
+// Decrement the reference count and free the page if it reaches zero
+int decref(void *pa)
+{
+  acquire(&page_ref.lock);
+  if (page_ref.count[(uint64)pa >> 12] <= 0)
+  {
+    panic("decrease_pgreference");
+  }
+  page_ref.count[(uint64)pa >> 12]--;
+  if (page_ref.count[(uint64)pa >> 12] > 0)
+  {
+    release(&page_ref.lock);
+    return 0;
+  }
+  release(&page_ref.lock);
+  return 1;
+}
+
 void
 kinit()
 {
+  initlock(&page_ref.lock, "page_ref");
+  acquire(&page_ref.lock);
+  for (int i = 0; i < (PGROUNDUP(PHYSTOP) >> 12); ++i)
+    page_ref.count[i] = 0;
+  release(&page_ref.lock);
   initlock(&kmem.lock, "kmem");
   freerange(end, (void*)PHYSTOP);
 }
@@ -35,8 +75,11 @@ freerange(void *pa_start, void *pa_end)
 {
   char *p;
   p = (char*)PGROUNDUP((uint64)pa_start);
-  for(; p + PGSIZE <= (char*)pa_end; p += PGSIZE)
+  for (; p + PGSIZE <= (char *)pa_end; p += PGSIZE)
+  {
+    incref(p);
     kfree(p);
+  }
 }
 
 // Free the page of physical memory pointed at by pa,
@@ -50,6 +93,11 @@ kfree(void *pa)
 
   if(((uint64)pa % PGSIZE) != 0 || (char*)pa < end || (uint64)pa >= PHYSTOP)
     panic("kfree");
+
+  if (!decref(pa))
+  {
+    return;
+  }
 
   // Fill with junk to catch dangling refs.
   memset(pa, 1, PGSIZE);
@@ -75,8 +123,10 @@ kalloc(void)
   if(r)
     kmem.freelist = r->next;
   release(&kmem.lock);
-
-  if(r)
-    memset((char*)r, 5, PGSIZE); // fill with junk
+  if (r)
+  {
+    memset((char *)r, 5, PGSIZE); // fill with junk
+    incref((void *)r);
+  }
   return (void*)r;
 }

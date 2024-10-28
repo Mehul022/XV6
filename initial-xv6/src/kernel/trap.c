@@ -27,6 +27,44 @@ void trapinithart(void)
   w_stvec((uint64)kernelvec);
 }
 
+int pgfault(uint64 va, pagetable_t pagetable)
+{
+  // struct proc *p = myproc();
+
+  // Check if va is a valid address
+  if (va >= MAXVA || va < PGSIZE)
+  {
+    return -2; // Return error if accessing an invalid address
+  }
+
+  va = PGROUNDDOWN(va);
+  pte_t *pte = walk(pagetable, va, 0);
+  if (pte == 0 || !(*pte & PTE_V))
+  {
+    return -1; // No valid mapping
+  }
+
+  uint64 pa = PTE2PA(*pte);
+  uint flags = PTE_FLAGS(*pte);
+
+  // Check if page is marked COW
+  if (flags & PTE_COW)
+  {
+    flags = (flags | PTE_W) & ~PTE_COW; // Update flags for write permission
+    char *mem = kalloc();
+    if (mem == 0)
+      return -1;
+
+    memmove(mem, (void *)pa, PGSIZE); // Copy page contents to new memory
+    *pte = PA2PTE(mem) | flags;       // Update PTE with new physical address and flags
+
+    sfence_vma();      // Flush TLB
+    kfree((void *)pa); // Free original physical page
+    return 0;
+  }
+  return -1; // Not a COW page fault, likely an invalid access
+}
+
 //
 // handle an interrupt, exception, or system call from user space.
 // called from trampoline.S
@@ -67,6 +105,12 @@ void usertrap(void)
   else if ((which_dev = devintr()) != 0)
   {
     // ok
+  }
+  else if (r_scause() == 15)
+  {
+    int r = pgfault(r_stval(), p->pagetable);
+    if (r)
+      p->killed = 1;
   }
   else
   {

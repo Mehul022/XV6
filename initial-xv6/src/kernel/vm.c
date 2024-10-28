@@ -332,6 +332,41 @@ uvmcopy(pagetable_t old, pagetable_t new, uint64 sz)
   return -1;
 }
 
+int uvmcowcopy(pagetable_t old, pagetable_t new, uint64 sz)
+{
+  pte_t *pte;
+  uint64 pa, i;
+  uint flags;
+
+  for (i = 0; i < sz; i += PGSIZE)
+  {
+    if ((pte = walk(old, i, 0)) == 0)
+      panic("uvmcowcopy: pte should exist");
+    if ((*pte & PTE_V) == 0)
+      panic("uvmcowcopy: page not present");
+
+    pa = PTE2PA(*pte);
+    flags = PTE_FLAGS(*pte);
+
+    // Mark the page as read-only and set the copy-on-write flag.
+    if (flags & PTE_W)
+    {
+      flags = (flags & (~PTE_W)) | PTE_COW;
+      *pte = PA2PTE(pa) | flags;
+    }
+    if (mappages(new, i, PGSIZE, pa, flags) != 0)
+      goto err;
+
+    // Increment the reference count for the shared page.
+    incref((void *)pa); // Increment reference count for the shared page
+  }
+  return 0;
+
+err:
+  uvmunmap(new, 0, i / PGSIZE, 1);
+  return -1;
+}
+
 // mark a PTE invalid for user access.
 // used by exec for the user stack guard page.
 void
