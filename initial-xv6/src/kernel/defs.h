@@ -149,6 +149,7 @@ void            trapinit(void);
 void            trapinithart(void);
 extern struct spinlock tickslock;
 void            usertrapret(void);
+int             pgfault(uint64 va, pagetable_t pagetable);
 
 // uart.c
 void            uartinit(void);
