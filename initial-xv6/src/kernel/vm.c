@@ -393,6 +393,11 @@ copyout(pagetable_t pagetable, uint64 dstva, char *src, uint64 len)
     pa0 = walkaddr(pagetable, va0);
     if(pa0 == 0)
       return -1;
+    if (PTE_FLAGS(*(walk(pagetable, va0, 0))) & PTE_COW)
+    {
+      pgfault(va0, pagetable);
+      pa0 = walkaddr(pagetable, va0);
+    }
     n = PGSIZE - (dstva - va0);
     if(n > len)
       n = len;
