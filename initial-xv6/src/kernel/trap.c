@@ -50,7 +50,7 @@ int pgfault(uint64 va, pagetable_t pagetable)
   // Check if page is marked COW
   if (flags & PTE_COW)
   {
-    flags = (flags | PTE_W) & ~PTE_COW; // Update flags for write permission
+    flags = (flags | PTE_W | PTE_R) & ~PTE_COW; // Update flags for write permission
     char *mem = kalloc();
     if (mem == 0)
       return -1;
