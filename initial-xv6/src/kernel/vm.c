@@ -351,7 +351,7 @@ int uvmcowcopy(pagetable_t old, pagetable_t new, uint64 sz)
     // Mark the page as read-only and set the copy-on-write flag.
     if (flags & PTE_W)
     {
-      flags = (flags & (~PTE_W)) | PTE_COW;
+      flags = (flags & (~PTE_W)) | PTE_COW | PTE_R;
       *pte = PA2PTE(pa) | flags;
     }
     if (mappages(new, i, PGSIZE, pa, flags) != 0)
