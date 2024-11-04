@@ -435,7 +435,10 @@ void exit(int status)
 
   if (p == initproc)
     panic("init exiting");
-
+// for (int i = 0; i <= 25; i++)
+// {
+//   pp->parent->syscall_count[i] += pp->syscall_count[i];
+// }
   // Close all open files.
   for (int fd = 0; fd < NOFILE; fd++)
   {
